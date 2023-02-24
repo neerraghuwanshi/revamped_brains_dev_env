@@ -1,0 +1,53 @@
+version: "3.8"
+services:
+  mongodb:
+    networks:
+      - revamped_brains
+    image: 'mongo'
+    volumes: 
+      - mongodb_data:/data/db
+    env_file: 
+      - ./env/mongodb.env
+  backend:
+    networks:
+      - revamped_brains
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    ports:
+      - '8000:8000'
+      - '8001:8001'
+    volumes: 
+      - ./backend:/app
+      - backend_logs:/app/logs
+      - /app/node_modules
+    stdin_open: true
+    tty: true
+    env_file: 
+      - ./env/backend.env
+    depends_on:
+      - mongodb
+  frontend:
+    networks:
+      - revamped_brains
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    ports: 
+      - '3000:3000'
+      - '3001:3001'
+    volumes: 
+      - ./frontend:/app
+      - frontend_logs:/app/logs
+      - /app/node_modules
+    stdin_open: true
+    tty: true
+    env_file:
+      - ./env/frontend.env
+    depends_on: 
+      - backend
+
+volumes: 
+  mongodb_data:
+  backend_logs:
+  frontend_logs:
