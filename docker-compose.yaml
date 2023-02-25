@@ -1,6 +1,7 @@
 version: "3.8"
 services:
   mongodb:
+    container_name: revamped_brains_dev_env_mongodb
     networks:
       - revamped_brains
     image: 'mongo'
@@ -9,18 +10,20 @@ services:
     env_file: 
       - ./env/mongodb.env
   backend:
+    container_name: revamped_brains_dev_env_backend
     networks:
       - revamped_brains
     build:
       context: ./backend
       dockerfile: Dockerfile.dev
+    image: revamped_brains_dev_env_backend
     ports:
       - '8000:8000'
       - '8001:8001'
     volumes: 
       - ./backend:/app
-      - backend_logs:/app/logs
       - /app/node_modules
+      - backend_logs:/app/logs
     stdin_open: true
     tty: true
     env_file: 
@@ -28,18 +31,20 @@ services:
     depends_on:
       - mongodb
   frontend:
+    container_name: revamped_brains_dev_env_frontend
     networks:
       - revamped_brains
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
+    image: revamped_brains_dev_env_frontend
     ports: 
       - '3000:3000'
       - '3001:3001'
     volumes: 
       - ./frontend:/app
-      - frontend_logs:/app/logs
       - /app/node_modules
+      - frontend_logs:/app/logs
     stdin_open: true
     tty: true
     env_file:
@@ -47,7 +52,14 @@ services:
     depends_on: 
       - backend
 
-volumes: 
+volumes:
   mongodb_data:
+    name: revamped_brains_dev_env_mongodb_data
   backend_logs:
+    name: revamped_brains_dev_env_backend_logs
   frontend_logs:
+    name: revamped_brains_dev_env_frontend_logs
+
+networks:
+  revamped_brains:
+    name: revamped_brains_dev_env
